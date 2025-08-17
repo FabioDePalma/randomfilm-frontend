@@ -83,7 +83,7 @@ pipeline {
                     echo 'Cleaning up local artifacts...'
                     sh '''
                         # Rimuovi la cartella dist locale
-                        # rm -rf dist/
+                        rm -rf dist/
                         
                         # Rimuovi l'immagine Docker (opzionale)
                         docker rmi ${DOCKER_IMAGE} || true
