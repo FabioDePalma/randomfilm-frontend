@@ -1,6 +1,6 @@
-
-const API_BASE_URL = 'http://localhost:8087/api';
-const AUTH_API_URL = `http://localhost:8080/api/auth`;
+const INGRESS_IP = '34.54.22.225';  
+const API_BASE_URL = `http://${INGRESS_IP}/api`;       
+const AUTH_API_URL = `http://${INGRESS_IP}/api/auth`;  
 
 // const API_BASE_URL = 'http://34.54.230.164/api';
 
