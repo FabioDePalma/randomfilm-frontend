@@ -1,120 +1,76 @@
 pipeline {
     agent any
-    
+
+    // Definisce le variabili per facilitare la modifica dei valori.
     environment {
-        // Configurazione delle variabili d'ambiente
-        DOCKER_IMAGE = 'frontend-build-spa'
-        GCS_BUCKET = 'gs://randomfilm-frontend/'
-        DIST_FOLDER = '/app/dist'
+        // L'ID delle credenziali configurate in Jenkins, che puntano al tuo account di servizio GCP.
+        GCP_CREDENTIALS_ID = 'gcp-service-account2' 
+        
+        // Il percorso completo del tuo repository in Artifact Registry.
+        DOCKER_IMAGE_REPO = 'europe-west8-docker.pkg.dev/core-synthesis-468711-k5/randomfilm'
+        
+        // Il nome dell'immagine che stai costruendo.
+        DOCKER_IMAGE_NAME = 'users-backend'
+        
+        // Il tag dell'immagine.
+        DOCKER_IMAGE_TAG = 'latest'
     }
-    
+
+    // Le diverse fasi della pipeline.
     stages {
-        stage('Cleanup') {
+        // Fase 1: Verifica la connessione e l'autenticazione con Google Cloud.
+        stage('Verify GCP Connection') {
             steps {
                 script {
-                    // Pulizia immagini Docker esistenti (opzionale)
-                    sh '''
-                        docker rmi ${DOCKER_IMAGE} || true
-                        docker system prune -f || true
-                    '''
+                    // Usa il blocco 'withCredentials' per rendere disponibile il file della chiave.
+                    withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        // Attiva l'account di servizio usando il file della chiave.
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+
+                        // Verifica l'autenticazione.
+                        echo "Verifica autenticazione gcloud..."
+                        sh "gcloud auth list"
+
+                        // Verifica il progetto GCP.
+                        echo "Verifica progetto GCP..."
+                        sh "gcloud config list project"
+
+                        echo "Connessione a GCP riuscita! 🎉"
+                    }
                 }
             }
         }
-        
+
+        // Fase 2: Costruisce l'immagine Docker.
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo 'Building Docker image...'
-                    sh 'docker build -t ${DOCKER_IMAGE} -f DockerfileBuildSPA .'
-                }
+                echo 'Building the Docker image...'
+                // Esegue il comando docker build utilizzando il Dockerfile_test.
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile_test ."
             }
         }
-        
-        stage('Extract Build Artifacts') {
+
+        // Fase 3: Esegue il tag e il push dell'immagine al registry di Google Cloud.
+        stage('Tag and Push Docker Image') {
             steps {
                 script {
-                    echo 'Creating container and extracting dist folder...'
-                    sh '''
-                        # Crea il container senza avviarlo
-                        CONTAINER_ID=$(docker create ${DOCKER_IMAGE})
-                        echo "Container ID: $CONTAINER_ID"
-                        
-                        
-                        # Copia la cartella dist dal container
-                        docker cp $CONTAINER_ID:${DIST_FOLDER} ./
-                        
-                        # Pulisci il container
-                        docker rm $CONTAINER_ID
-                        
-                        # Verifica che la cartella dist esista
-                        if [ ! -d "dist" ]; then
-                            echo "Errore: cartella dist non trovata!"
-                            exit 1
-                        fi
-                        
-                        # Mostra il contenuto della cartella dist
-                        echo "Contenuto cartella dist:"
-                        ls -la dist/
-                    '''
+                    // Anche in questo stage è necessaria l'autenticazione.
+                    withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+
+                        echo 'Configuring Docker for Artifact Registry...'
+                        // Configura Docker per usare gcloud come helper per l'autenticazione.
+                        sh "gcloud auth configure-docker ${DOCKER_IMAGE_REPO}"
+
+                        echo 'Tagging the Docker image...'
+                        // Tagga l'immagine locale con il percorso completo del repository remoto.
+                        sh "docker tag ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ${DOCKER_IMAGE_REPO}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+
+                        echo 'Pushing the Docker image to Artifact Registry...'
+                        // Esegue il push dell'immagine al repository in Google Cloud.
+                        sh "docker push ${DOCKER_IMAGE_REPO}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    }
                 }
-            }
-        }
-        
-        stage('Deploy to Google Cloud Storage') {
-            steps {
-                script {
-                    echo 'Deploying to Google Cloud Storage...'
-                    sh '''
-                        # Verifica che gcloud sia configurato
-                        gcloud auth list
-                        
-                        # Carica tutti i file della cartella dist su GCS
-                        gcloud storage cp dist/* ${GCS_BUCKET} --recursive
-                        
-                        echo "Deploy completato su ${GCS_BUCKET}"
-                    '''
-                }
-            }
-        }
-        
-        stage('Cleanup Artifacts') {
-            steps {
-                script {
-                    echo 'Cleaning up local artifacts...'
-                    sh '''
-                        # Rimuovi la cartella dist locale
-                        rm -rf dist/
-                        
-                        # Rimuovi l'immagine Docker (opzionale)
-                        docker rmi ${DOCKER_IMAGE} || true
-                    '''
-                }
-            }
-        }
-    }
-    
-    post {
-        always {
-            script {
-                echo 'Pipeline completata'
-            }
-        }
-        success {
-            script {
-                echo 'Deploy completato con successo!'
-            }
-        }
-        failure {
-            script {
-                echo 'Pipeline fallita. Controllare i log.'
-                // Cleanup in caso di errore
-                sh '''
-                    # Rimuovi container orfani
-                    docker ps -a --filter "ancestor=${DOCKER_IMAGE}" --format "{{.ID}}" | xargs -r docker rm -f
-                    
-                    # Rimuovi cartella dist se presente
-                    rm -rf dist/ || true
-                '''
             }
         }
     }
