@@ -77,11 +77,20 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                        sh 'gcloud container clusters get-credentials randomfilm --region europe-west8 --project core-synthesis-468711-k5'
+                        sh '''
+                        echo ">>> Autenticazione a GCP..."
+                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-                        echo 'Updating Kubernetes deployment...'
-                        sh "kubectl rollout status deployment/${DOCKER_IMAGE_NAME} -n randomfilm"
+                        echo ">>> Configurazione accesso cluster GKE..."
+                        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+                        gcloud container clusters get-credentials randomfilm --region europe-west8 --project core-synthesis-468711-k5
+
+                        echo ">>> Riavvio del deployment ${DOCKER_IMAGE_NAME}..."
+                        kubectl rollout restart deployment/${DOCKER_IMAGE_NAME} -n randomfilm
+
+                        echo ">>> Attesa completamento rollout..."
+                        kubectl rollout status deployment/${DOCKER_IMAGE_NAME} -n randomfilm
+                        '''
                     }
                 }
             }
