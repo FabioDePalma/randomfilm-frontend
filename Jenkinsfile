@@ -10,7 +10,7 @@ pipeline {
         DOCKER_IMAGE_REPO = 'europe-west8-docker.pkg.dev/core-synthesis-468711-k5/randomfilm'
         
         // Il nome dell'immagine che stai costruendo.
-        DOCKER_IMAGE_NAME = 'randomfilm-backend'
+        DOCKER_IMAGE_NAME = 'frontend'
         
         // Il tag dell'immagine.
         DOCKER_IMAGE_TAG = 'latest'
