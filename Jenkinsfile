@@ -46,7 +46,7 @@ pipeline {
             steps {
                 echo 'Building the Docker image...'
                 // Esegue il comando docker build utilizzando il Dockerfile_test.
-                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile_test ."
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile.frontend ."
             }
         }
 
