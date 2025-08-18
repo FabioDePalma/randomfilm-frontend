@@ -73,5 +73,18 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                        sh 'gcloud container clusters get-credentials randomfilm --region europe-west8 --project core-synthesis-468711-k5'
+
+                        echo 'Updating Kubernetes deployment...'
+                        sh "kubectl rollout status deployment/${DOCKER_IMAGE_NAME} -n randomfilm"
+                    }
+                }
+            }
+        }
     }
 }
