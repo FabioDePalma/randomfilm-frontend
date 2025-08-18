@@ -60,7 +60,7 @@ pipeline {
 
                         echo 'Configuring Docker for Artifact Registry...'
                         // Configura Docker per usare gcloud come helper per l'autenticazione.
-                        sh "gcloud auth configure-docker ${DOCKER_IMAGE_REPO}"
+                        sh "gcloud auth configure-docker europe-west8-docker.pkg.dev"
 
                         echo 'Tagging the Docker image...'
                         // Tagga l'immagine locale con il percorso completo del repository remoto.
