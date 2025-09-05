@@ -60,7 +60,7 @@ const LoginPage = () => {
       
       <form onSubmit={onSubmit}>
         <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Username o E-mail</label>
           <input 
             id="username"
             name="username"

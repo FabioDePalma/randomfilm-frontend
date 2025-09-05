@@ -41,7 +41,7 @@ function FilmsListPage() {
       setError('');
       
       let response;
-      if (activeSearchTerm.trim().length >= 3) {
+      if (activeSearchTerm.trim().length >= 2) {
         setIsSearching(true);
         response = await searchFilmsPaginated(activeSearchTerm, currentPage, pageSize, sortDir);
       } else {

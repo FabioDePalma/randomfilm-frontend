@@ -71,7 +71,7 @@ function Header() {
                 {isUserMenuOpen && (
                   <div className="user-dropdown">
                     <div className="user-dropdown-item logout" onClick={handleLogoutClick}>
-                      🚪 Logoutt
+                      🚪 Logout
                     </div>
                   </div>
                 )}
