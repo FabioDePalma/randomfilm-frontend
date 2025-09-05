@@ -1,9 +1,9 @@
 const INGRESS_IP = '34.54.230.164';  
-// const API_BASE_URL = `http://${INGRESS_IP}/api`;       
-// const AUTH_API_URL = `http://${INGRESS_IP}/api/auth`;  
+const API_BASE_URL = `http://${INGRESS_IP}/api`;       
+const AUTH_API_URL = `http://${INGRESS_IP}/api/auth`;  
 // const INGRESS_IP = 'localhost'; 
-const API_BASE_URL = `http://${INGRESS_IP}:8087/api`;       
-const AUTH_API_URL = `http://${INGRESS_IP}:8080/api/auth`;  
+// const API_BASE_URL = `http://${INGRESS_IP}:8087/api`;       
+// const AUTH_API_URL = `http://${INGRESS_IP}:8080/api/auth`;  
 
 // const API_BASE_URL = 'http://34.54.230.164/api';
 
