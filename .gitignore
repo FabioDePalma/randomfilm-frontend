@@ -17,6 +17,9 @@ index-copy.css
 /src/pages/FilmsListPage-copy.jsx
 /src/pages/SearchPage-copy.jsx
 /src/pages/RandomFilmPage-copy.jsx
+/src/pages/RandomFilmPage-copy.jsx
+/src/components/ChangePassword.jsx
+
 Dockerfile.frontend
 DockerfileBuildSPA
 # Editor directories and files

@@ -51,7 +51,7 @@ function RandomFilmPage() {
         addNotification('Errore nel recupero del film casuale: ' + err.message, 'error');
       } finally {
         setLoading(false);
-        setTimeout(() => setShowAnimation(false), 2000); // nasconde scatola dopo l'animazione
+        setTimeout(() => setShowAnimation(false), 2000); 
       }
     }, 800);
   };

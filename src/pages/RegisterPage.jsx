@@ -74,11 +74,9 @@ function RegisterPage() {
 
   try {
     const response = await signup(formData.username, formData.email, formData.password);
-    // Usa il messaggio dal backend invece di uno hardcoded
+
     setSuccess(response.message || 'Richiesta inviata con successo!');
     
-    // Non reindirizzare automaticamente - l'utente deve aspettare l'approvazione
-    // setTimeout(() => navigate('/login'), 2000); ← Rimuovi questa riga
     
   } catch (err) {
     setErrors({ general: err.message || 'Errore durante la registrazione' });

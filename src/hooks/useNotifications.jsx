@@ -13,7 +13,7 @@ export default function useNotifications() {
       id, 
       message, 
       type,
-      createdAt: Date.now() // AGGIUNTO: timestamp di creazione
+      createdAt: Date.now() 
     };
     setNotifications(prev => [...prev, newNotification]);
   }, []);
