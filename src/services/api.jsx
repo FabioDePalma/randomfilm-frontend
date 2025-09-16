@@ -23,7 +23,7 @@ export const login = async (username, password) => {
   // normalizza il token in "token"
   const token =
     data.token ??
-    data.accessToken ??       // <-- quello che ti arriva dal backend
+    data.accessToken ?? 
     data.jwt ??
     data.access_token;
 
@@ -33,7 +33,7 @@ export const login = async (username, password) => {
   console.log(data);
 
   return {
-    token,                    // <--- chiave che usa il resto dell’app
+    token,
     id: data.id,
     username: data.username,
     email: data.email,

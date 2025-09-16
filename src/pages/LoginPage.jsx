@@ -37,7 +37,7 @@ const LoginPage = () => {
     }
   };
 
-  // Mostra loading durante l'inizializzazione dell'auth
+  // Mostra caricamento durante l'inizializzazione dell'auth
   if (authLoading) {
     return <div>Caricamento...</div>;
   }

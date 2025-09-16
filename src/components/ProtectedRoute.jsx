@@ -7,7 +7,6 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
   const location = useLocation();
 
-  // Mostra loading durante il controllo dell'autenticazione
   if (loading) {
     return <div>Verificando l'autenticazione...</div>;
   }
