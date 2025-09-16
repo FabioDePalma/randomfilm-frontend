@@ -11,7 +11,14 @@ node_modules
 dist
 dist-ssr
 *.local
-
+index-copy.css
+/src/services/api-copy.jsx
+/src/pages/FilmsListPage-copy-2.jsx
+/src/pages/FilmsListPage-copy.jsx
+/src/pages/SearchPage-copy.jsx
+/src/pages/RandomFilmPage-copy.jsx
+Dockerfile.frontend
+DockerfileBuildSPA
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

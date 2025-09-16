@@ -33,7 +33,7 @@ function SearchPage() {
     e.preventDefault();
     if (!searchTerm.trim()) {
       setError('Inserisci il titolo di un film');
-      setShowManualInsert(false); // Non mostrare inserimento manuale per errori di validazione
+      setShowManualInsert(false); 
       addNotification('Inserisci il titolo di un film', 'warning');
       return;
     }

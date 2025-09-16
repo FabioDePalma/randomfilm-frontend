@@ -1,11 +1,11 @@
-const INGRESS_IP = '34.54.230.164';  
-const API_BASE_URL = `http://${INGRESS_IP}/api`;       
-const AUTH_API_URL = `http://${INGRESS_IP}/api/auth`;  
-// const INGRESS_IP = 'localhost'; 
-// const API_BASE_URL = `http://${INGRESS_IP}:8087/api`;       
-// const AUTH_API_URL = `http://${INGRESS_IP}:8080/api/auth`;  
+// const INGRESS_IP = '34.54.230.164';  
+// const API_BASE_URL = `http://${INGRESS_IP}/api`;       
+// const AUTH_API_URL = `http://${INGRESS_IP}/api/auth`;  
+const INGRESS_IP = 'localhost'; 
+const API_BASE_URL = `http://${INGRESS_IP}:8087/api`;       
+const AUTH_API_URL = `http://${INGRESS_IP}:8080/api/auth`;  
 
-// const API_BASE_URL = 'http://34.54.230.164/api';
+
 
 export const login = async (username, password) => {
   const response = await fetch(`${AUTH_API_URL}/signin`, {
@@ -65,12 +65,35 @@ const apiFetch = async (url, options = {}) => {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
 
-  return response;
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    console.log(response.status);
+
+    if (response.status === 401) {
+      // Logout forzato
+      localStorage.clear();
+      window.location.href = "/login"; 
+      throw new Error("Sessione scaduta, effettua di nuovo il login");
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Errore fetch API:", error);
+    console.log("token scaduto o pod non disponibile!");
+    //se sono qui significa che i pod non sono up & runing OPPURE è scaduto il token!!!!
+    if (error instanceof TypeError && token) {
+      // localStorage.clear();
+      // window.location.href = "/login";
+      throw new Error("Servizio non disponibile, riprova più tardi");
+    }
+
+    throw error;
+  }
 };
 
 
@@ -78,7 +101,7 @@ const apiFetch = async (url, options = {}) => {
 const handleResponse = async (response) => {
   if (!response.ok) {
     const contentType = response.headers.get('content-type');
-    
+    console.log(response.status);
     // Prova a estrarre il messaggio di errore dal JSON del backend
     if (contentType?.includes('application/json')) {
       try {
